@@ -16,12 +16,16 @@ func ws_handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Клиент подключился")
-	_, p, err := conn.ReadMessage()
+	defer conn.Close()
+	messageType, p, err := conn.ReadMessage()
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	msg := string(p)
 	log.Println(msg)
-	defer conn.Close()
+	if err := conn.WriteMessage(messageType, p); err != nil {
+		log.Println(err)
+		return
+	}
 }
