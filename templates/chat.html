@@ -102,17 +102,20 @@
     <div class="message-list">
         <h2>Сообщения</h2>
 
-        {{ if .Messages }}
-            {{ range .Messages }}
-                <div class="message">
-                    <div class="author">{{ .Author }}</div>
-                    <div>{{ .Text }}</div>
-                </div>
+        <div id="messages">
+            {{ if .Messages }}
+                {{ range .Messages }}
+                    <div class="message">
+                        <div class="author">{{ .Author }}</div>
+                        <div>{{ .Text }}</div>
+                    </div>
+                {{ end }}
+            {{ else }}
+                <p class="empty">Пока сообщений нет.</p>
             {{ end }}
-        {{ else }}
-            <p class="empty">Пока сообщений нет.</p>
-        {{ end }}
+        </div>
     </div>
+
     <script>
         const socket = new WebSocket("ws://localhost:8080/ws");
 
@@ -122,6 +125,21 @@
 
         socket.onerror = function(error) {
             console.log("WebSocket error:", error);
+        };
+
+        socket.onmessage = function(event) {
+            const messagesContainer = document.getElementById("messages");
+            const emptyMessage = messagesContainer.querySelector(".empty");
+
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+
+            const messageDiv = document.createElement("div");
+            messageDiv.className = "message";
+            messageDiv.textContent = event.data;
+
+            messagesContainer.appendChild(messageDiv);
         };
 
         const form = document.querySelector("form");
@@ -143,9 +161,6 @@
 
             messageInput.value = "";
         });
-        socket.onmessage = function(event) {
-            console.log(event.data);
-        };
     </script>
 </body>
 </html>
