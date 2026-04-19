@@ -1,11 +1,10 @@
 package main
 
-import "time"
-
 type Message struct {
-	Author string
-	Time   time.Time
-	Text   string
+	Author string `json:"author"`
+	Time   string `json:"time"`
+	Date   string `json:"date"`
+	Text   string `json:"text"`
 }
 
 type PageData struct {

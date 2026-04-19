@@ -60,9 +60,27 @@
             background: #fff;
         }
 
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
         .author {
             font-weight: bold;
-            margin-bottom: 6px;
+        }
+
+        .meta {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .text {
+            white-space: pre-wrap;
+            word-break: break-word;
         }
 
         .empty {
@@ -106,8 +124,11 @@
             {{ if .Messages }}
                 {{ range .Messages }}
                     <div class="message">
-                        <div class="author">{{ .Author }}</div>
-                        <div>{{ .Text }}</div>
+                        <div class="message-header">
+                            <div class="author">{{ .Author }}</div>
+                            <div class="meta">{{ .Date }} {{ .Time }}</div>
+                        </div>
+                        <div class="text">{{ .Text }}</div>
                     </div>
                 {{ end }}
             {{ else }}
@@ -135,9 +156,31 @@
                 emptyMessage.remove();
             }
 
+            const message = JSON.parse(event.data);
+
             const messageDiv = document.createElement("div");
             messageDiv.className = "message";
-            messageDiv.textContent = event.data;
+
+            const headerDiv = document.createElement("div");
+            headerDiv.className = "message-header";
+
+            const authorDiv = document.createElement("div");
+            authorDiv.className = "author";
+            authorDiv.textContent = message.author;
+
+            const metaDiv = document.createElement("div");
+            metaDiv.className = "meta";
+            metaDiv.textContent = message.date + " " + message.time;
+
+            const textDiv = document.createElement("div");
+            textDiv.className = "text";
+            textDiv.textContent = message.text;
+
+            headerDiv.appendChild(authorDiv);
+            headerDiv.appendChild(metaDiv);
+
+            messageDiv.appendChild(headerDiv);
+            messageDiv.appendChild(textDiv);
 
             messagesContainer.appendChild(messageDiv);
         };
@@ -156,8 +199,13 @@
                 return;
             }
 
-            const fullMessage = username + ": " + message;
-            socket.send(fullMessage);
+            const payload = {
+                author: username,
+                text: message
+            };
+
+            const jsonMessage = JSON.stringify(payload);
+            socket.send(jsonMessage);
 
             messageInput.value = "";
         });

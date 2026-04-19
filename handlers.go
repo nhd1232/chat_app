@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 )
 
 func chat_handler(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +50,7 @@ func send_handler(w http.ResponseWriter, r *http.Request) {
 
 	msg := Message{
 		Author: author,
-		Time:   time.Now(),
+		Time:   "",
 		Text:   text,
 	}
 
